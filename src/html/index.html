@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Chat</title>
+
+    <link rel="preload" href="styles.css" as="style">
+    <link rel="preload" href="themes.css" as="style">
+    <link rel="preload" href="scripts.js" as="script">
+    <link rel="preload" href="web_ibm_dos_iso8.woff" as="font">
+
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="themes.css">
+</head>
+<body>
+    <div class="bar">
+        <div id="rooms"></div>
+        <button class="bar-tile" id="add-room">Add Room</button>
+        <button class="bar-tile" id="set-name"></button>
+        <select class="bar-tile" id="theme-select">
+            <option value="default">Default</option>
+            <option value="default-dark">Default Dark</option>
+            <option value="old">Old</option>
+            <option value="neon">Neon</option>
+            <option value="cosmic">Cosmic</option>
+        </select>
+        <div id="connection-indicator" class="offline"></div>
+    </div>
+
+    <div id="messages"></div>
+
+    <div class="bar">
+        <input type="text" class="bar-tile" id="input" maxlength="1024">
+        <button class="bar-tile" id="send">Send</button>
+    </div>
+
+    <script src="scripts.js"></script>
+</body>
+</html>

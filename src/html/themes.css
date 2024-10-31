@@ -1,0 +1,94 @@
+/* Default Dark */
+
+.theme-default-dark {
+    background-color: #151515;
+    color: #FFF;
+}
+.theme-default-dark .bar {
+    background-color: #333;
+}
+.theme-default-dark .bar-tile,
+.theme-default-dark .exit-room {
+    border-color: #888;
+}
+.theme-default-dark .server-content {
+    color: #AAA;
+}
+
+/* Old */
+
+@font-face {
+    font-family: 'Web IBM DOS ISO8';
+    font-style: normal;
+    font-weight: 400;
+    src: url("web_ibm_dos_iso8.woff") format('woff');
+}
+
+.theme-old {
+    font-family: 'Web IBM DOS ISO8', sans-serif;
+}
+.theme-old > .bar:nth-child(1) .bar-tile {
+    background-color: #AAF;
+    border-color: #CCF #88D #88D #CCF;
+}
+.theme-old > .bar:nth-child(1) .bar-tile:active {
+    border-color: #88D #CCF #CCF #88D;
+}
+
+.theme-old .bar-tile,
+.theme-old .exit-room {
+    border-color: #DEDEDE #888 #888 #DEDEDE;
+}
+.theme-old .bar-tile:active,
+.theme-old .exit-room:active {
+    border-color: #888 #DEDEDE #DEDEDE #888;
+}
+
+/* Terminal */
+
+
+
+/* Neon */
+
+.theme-neon {
+    font-family: 'Monaco', monospace;
+    background-image: linear-gradient(#151515, #333);
+}
+.theme-neon .bar {
+    background-image: linear-gradient(#343, #464);
+}
+
+.theme-neon .bar-tile,
+.theme-neon .exit-room {
+    background-color: #8F8;
+    border-color: #FCA;
+    border-radius: 4px;
+}
+
+.theme-neon .message {
+    color: #FFF;
+}
+.theme-neon .server-content {
+    color: #AAA;
+}
+
+/* Cosmic */
+
+.theme-cosmic {
+    background-image: linear-gradient(#225, #425);
+    color: rgba(255, 255, 255, 0.6);
+}
+.theme-cosmic .bar {
+    background-color: #536;
+}
+.theme-cosmic .bar:nth-child(1) {
+    background-color: #336;
+}
+.theme-cosmic .server-content {
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.theme-cosmic .bar-tile,
+.theme-cosmic .exit-room {
+    border-color: rgba(0, 0, 0, 0.4);
+}

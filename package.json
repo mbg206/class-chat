@@ -1,0 +1,23 @@
+{
+  "name": "class-chat",
+  "version": "1.0.0",
+  "description": "A simple NodeJS chat application.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mbg206/class-chat.git"
+  },
+  "author": "mbg206",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mbg206/class-chat/issues"
+  },
+  "homepage": "https://github.com/mbg206/class-chat#readme",
+  "dependencies": {
+    "class-chat": "file:",
+    "ws": "^8.18.0"
+  }
+}

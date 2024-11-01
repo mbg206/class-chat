@@ -8,8 +8,6 @@ Depends only on `ws`.
 
 Add server-side commands
 
-More server notifications (such as name changes)
-
 Finalize readme
 
-Markdown support
+Markdown support?

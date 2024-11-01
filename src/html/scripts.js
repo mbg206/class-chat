@@ -153,6 +153,9 @@ const createSocket = () => {
             nameButton.textContent = content;
             localStorage.setItem("name", content);
         }
+        if (type === "F") {
+            alert("That display name is currently taken!");
+        }
         else if (type === "J") {
             const tab = element("div", "bar-tile room");
             tab.addEventListener("click", () => {
@@ -220,7 +223,9 @@ roomButton.addEventListener("click", () => {
 
 nameButton.addEventListener("click", () => {
     if (socket.readyState === WebSocket.OPEN) {
-        const name = dialog("Enter a new display name:", nameButton.textContent).trim();
+        const name = dialog("Enter a new display name:",
+            roomElements.size === 0 ? null : nameButton.textContent).trim();
+        
         if (name.length > 16 || name.length === 0)
             alert("Input name has an invalid length!");
         else socket.send(`N${name}`);

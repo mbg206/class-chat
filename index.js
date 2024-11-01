@@ -47,6 +47,13 @@ server.on("connection", (socket) => {
 
     socket.on("pong", () => socket.pinged = false);
     socket.on("error", console.error);
+    socket.on("close", (e) => {
+        const message = e === 1001 ?
+            "has left the room" :
+            "has lost connection";
+        for (const room of socket.rooms.values())
+            broadcast(room, `M${room}\t\t${socket.name} ${message}`);
+    });
 
     socket.on("message", (data) => {
         const msg = data.toString();
@@ -67,6 +74,8 @@ server.on("connection", (socket) => {
             if (nameTaken)
                 socket.send("F");
             else {
+                for (const room of socket.rooms.values())
+                    broadcast(room, `M${room}\t\t${socket.name} has changed their name to ${name}`);
                 socket.name = name;
                 socket.send(msg);
             }

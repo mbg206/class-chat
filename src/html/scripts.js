@@ -64,14 +64,38 @@ const putMessage = (sender, content) => {
 
 const roomElements = new Map();
 
+const roomUnreads = new Map();
+let isBlurred = false;
+const updateTitle = () => {
+    let unreads = 0;
+    for (const n of roomUnreads.values())
+        unreads += n;
+
+    if (unreads === 0)
+        document.title = "Class Chat";
+    else document.title = `(${unreads}) Class Chat`;
+};
+window.addEventListener("blur", () => isBlurred = true);
+window.addEventListener("focus", () => {
+    isBlurred = false;
+    roomUnreads.set(selectedRoom, 0);
+    updateTitle();
+});
+
 let selectedRoom;
 const selectRoom = (room) => {
+    if (selectedRoom !== undefined)
+        roomElements.get(selectedRoom).classList.remove("selected");
     selectedRoom = room;
     messageContainer.innerHTML = "";
     const data = messages.get(room);
     data.forEach(msg => putMessage(msg[0], msg[1]));
+    roomElements.get(room).classList.add("selected");
 };
 
+/**
+ * @type {WebSocket}
+ */
 let socket;
 let messages = new Map();
 const createSocket = () => {
@@ -85,24 +109,33 @@ const createSocket = () => {
         return;
     }
 
-    socket.addEventListener("open", async () => {
+    socket.addEventListener("open", () => {
         indicator.className = "online";
         indicator.title = "Connected";
         socket.send(`N${localStorage.getItem("name")}`);
         
-        roomContainer.innerHTML = "";
-        const rooms = JSON.parse(localStorage.getItem("rooms"));
-        for (let i = 0; i < rooms.length; i++) {
-            const msg = `J${rooms[i]}`;
-            socket.send(msg);
-            await new Promise((res, rej) => {
-                socket.addEventListener("message", (data) => {
-                    if (data.data === msg) res();
+        const roomJoinListener = async (data) => {
+            if (data.data.charAt(0) !== "N") return;
+
+            roomContainer.innerHTML = "";
+            const rooms = JSON.parse(localStorage.getItem("rooms"));
+            for (let i = 0; i < rooms.length; i++) {
+                const msg = `J${rooms[i]}`;
+                socket.send(msg);
+                await new Promise((res, rej) => {
+                    socket.addEventListener("message", (data) => {
+                        if (data.data === msg) res();
+                    });
+                    socket.addEventListener("close", rej);
                 });
-                socket.addEventListener("close", rej);
-            });
-        }
-        selectRoom(rooms[0]);
+            }
+            selectRoom(rooms[0]);
+            roomElements.get(rooms[0]).classList.remove("unread");
+
+            socket.removeEventListener("message", roomJoinListener);
+        };
+
+        socket.addEventListener("message", roomJoinListener);
     });
 
     socket.addEventListener("close", () => {
@@ -125,6 +158,10 @@ const createSocket = () => {
             tab.addEventListener("click", () => {
                 selectRoom(content);
                 tab.classList.remove("unread");
+                if (roomUnreads.get(content) > 0) {
+                    roomUnreads.set(content, 0);
+                    updateTitle();
+                }
             });
 
             const exitButton = element("button", "exit-room", "X");
@@ -138,19 +175,27 @@ const createSocket = () => {
             roomContainer.appendChild(tab);
             if (!messages.has(content))
                 messages.set(content, []);
+            roomUnreads.set(content, 0);
 
             updateRoomStorage();
         }
         else if (type === "L") {
             roomElements.get(content).remove();
             roomElements.delete(content);
+            roomUnreads.delete(content);
+            updateTitle();
             updateRoomStorage(content);
         }
         else if (type === "M") {
             const data = content.split("\t");
             messages.get(data[0]).push(data.slice(1));
-            if (data[0] === selectedRoom) putMessage(data[1], data[2]);
+            if (data[0] === selectedRoom) putMessage(data[1], data.slice(2).join("\t"));
             else roomElements.get(data[0]).classList.add("unread");
+
+            if (data[0] !== selectedRoom || isBlurred) {
+                roomUnreads.set(data[0], roomUnreads.get(data[0]) + 1);
+                updateTitle();
+            }
         }
 
     });

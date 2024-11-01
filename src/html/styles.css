@@ -69,8 +69,11 @@ option {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.room.unread .room-name {
+.room.selected .room-name {
     text-decoration: underline;
+}
+.room.unread .room-name {
+    text-shadow: 0.3px 0px currentColor, -0.3px 0px currentColor;
 }
 
 .exit-room {

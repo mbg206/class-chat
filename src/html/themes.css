@@ -46,23 +46,48 @@
 
 /* Terminal */
 
+.theme-terminal {
+    font-family: 'Web IBM DOS ISO8', sans-serif;
+    background-color: #111;
+    color: #FFF;
+}
+.theme-terminal .message {
+    color: #3F3;
+}
+.theme-terminal .server-content {
+    color: #AAA;
+}
 
+.theme-terminal .bar {
+    background-color: #333;
+}
+
+.theme-terminal .bar-tile,
+.theme-terminal .exit-room {
+    border-color: #555 #222 #222 #555;
+}
+.theme-terminal .bar-tile:active,
+.theme-terminal .exit-room:active {
+    border-color: #222 #555 #555 #222;
+}
 
 /* Neon */
 
 .theme-neon {
     font-family: 'Monaco', monospace;
-    background-image: linear-gradient(#151515, #333);
+    background-image: linear-gradient(#151515, #334);
 }
 .theme-neon .bar {
-    background-image: linear-gradient(#343, #464);
+    background-image: linear-gradient(#445, #557);
+    outline: 1px solid #FCA;
 }
 
 .theme-neon .bar-tile,
 .theme-neon .exit-room {
-    background-color: #8F8;
-    border-color: #FCA;
+    background-color: #ACF;
+    border-color: #FB8;
     border-radius: 4px;
+    box-shadow: 0 0 1px #FCA;
 }
 
 .theme-neon .message {

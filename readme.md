@@ -11,3 +11,5 @@ Add server-side commands
 Finalize readme
 
 Markdown support?
+
+Chat log downloading

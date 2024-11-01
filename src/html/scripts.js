@@ -49,6 +49,9 @@ const updateRoomStorage = (leaveRoom = null) => {
 };
 
 const putMessage = (sender, content) => {
+    const atBottom = messageContainer.scrollHeight - messageContainer.clientHeight
+        == messageContainer.scrollTop;
+
     if (sender === "")
         messageContainer.appendChild(element("div", "message server-content", content));
     else {
@@ -60,11 +63,18 @@ const putMessage = (sender, content) => {
         );
         messageContainer.appendChild(message);
     }
+
+    if (messageContainer.children.length > 500)
+        messageContainer.children[0].remove();
+
+    if (atBottom)
+        messageContainer.scrollTo({top: messageContainer.scrollHeight - messageContainer.clientHeight});
 };
 
 const roomElements = new Map();
-
+let roomMessages = new Map();
 const roomUnreads = new Map();
+
 let isBlurred = false;
 const updateTitle = () => {
     let unreads = 0;
@@ -88,7 +98,7 @@ const selectRoom = (room) => {
         roomElements.get(selectedRoom).classList.remove("selected");
     selectedRoom = room;
     messageContainer.innerHTML = "";
-    const data = messages.get(room);
+    const data = roomMessages.get(room);
     data.forEach(msg => putMessage(msg[0], msg[1]));
     roomElements.get(room).classList.add("selected");
 };
@@ -97,7 +107,6 @@ const selectRoom = (room) => {
  * @type {WebSocket}
  */
 let socket;
-let messages = new Map();
 const createSocket = () => {
     try {
         const protocol = window.location.protocol === "https:" ? "wss" : "ws";
@@ -176,8 +185,8 @@ const createSocket = () => {
             tab.append(element("span", "room-name", content), exitButton);
             roomElements.set(content, tab);
             roomContainer.appendChild(tab);
-            if (!messages.has(content))
-                messages.set(content, []);
+            if (!roomMessages.has(content))
+                roomMessages.set(content, []);
             roomUnreads.set(content, 0);
 
             updateRoomStorage();
@@ -191,7 +200,8 @@ const createSocket = () => {
         }
         else if (type === "M") {
             const data = content.split("\t");
-            messages.get(data[0]).push(data.slice(1));
+            const msgsArr = roomMessages.get(data[0]);
+            msgsArr.push(data.slice(1));
             if (data[0] === selectedRoom) putMessage(data[1], data.slice(2).join("\t"));
             else roomElements.get(data[0]).classList.add("unread");
 
@@ -199,6 +209,8 @@ const createSocket = () => {
                 roomUnreads.set(data[0], roomUnreads.get(data[0]) + 1);
                 updateTitle();
             }
+            if (msgsArr.length > 500)
+                msgsArr.shift();
         }
 
     });
@@ -238,6 +250,8 @@ const send = () => {
         inputBar.value = "";
         if (text.length === 0 || text.length > 2048) return;
         socket.send(`M${selectedRoom}\t${text}`);
+
+        messageContainer.scrollTo({top: messageContainer.scrollHeight - messageContainer.clientHeight});
     }
 };
 

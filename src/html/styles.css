@@ -73,7 +73,7 @@ option {
     text-decoration: underline;
 }
 .room.unread .room-name {
-    text-shadow: 0.3px 0px currentColor, -0.3px 0px currentColor;
+    text-shadow: 0.5px 0px currentColor, -0.5px 0px currentColor;
 }
 
 .exit-room {
@@ -96,8 +96,10 @@ option {
     padding: 4px 8px;
     display: flex;
     flex-direction: column;
-    justify-content: end;
     overflow-y: auto;
+}
+#messages > :first-child {
+    margin-top: auto;
 }
 .message {
     padding: 8px 0px;

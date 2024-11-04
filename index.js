@@ -41,6 +41,57 @@ const broadcast = (room, msg) => {
     });
 };
 
+const handleCommand = (socket, room, command, args) => {
+    if (command === "help")
+        socket.send(
+            `M${room}\t\tList of available commands:\n\n` +
+            "/help - Shows a list of available commands\n" +
+            "/online - Displays online users in the current room\n" +
+            "/msg <user> <message> - Privately messages a single user in the current room"
+        );
+
+    else if (command === "online") {
+        const names = [];
+        server.clients.forEach((s) => {
+            if (s.rooms.has(room))
+                names.push(s.name);
+        });
+        const message = `M${room}\t\tUsers in the current room:\n${names.join("\n")}\n\nNumber of users in this room: ${names.length}\nNumber of users globally: ${server.clients.size}`;
+        socket.send(message);
+    }
+
+    else if (command === "msg") {
+        const targetName = args[0];
+
+        if (targetName === socket.name) {
+            socket.send(`M${room}\t\tYou can't message yourself, silly!`);
+            return;
+        }
+
+        let target = null;
+        for (const s of server.clients)
+            if (s.name === targetName && s.rooms.has(room)) {
+                target = s;
+                break;
+            }
+        
+        if (target === null)
+            socket.send(`M${room}\t\tUser ${targetName} not found!`);
+
+        else {
+            const content = args.slice(1).join(" ").trim();
+            if (content.length === 0)
+                socket.send(`M${room}\t\tMessage content empty!`);
+            else {
+                socket.send(`M${room}\t\tYou to ${targetName}: ${content}`);
+                target.send(`M${room}\t\t${socket.name} to you: ${content}`);
+            }
+        }
+    }
+
+    else socket.send(`M${room}\t\tUnknown command. Type /help for a list of available commands.`);
+};
+
 server.on("connection", (socket) => {
     socket.rooms = new Set();
     socket.pinged = false;
@@ -110,7 +161,13 @@ server.on("connection", (socket) => {
             const message = msg.slice(split + 1).trim();
             if (message.length > 2048 || message.length === 0) return;
 
-            broadcast(room, `M${room}\t${socket.name}\t${message}`);
+            // command handling
+            if (message.charAt(0) === "/") {
+                const words = message.slice(1).split(" ");
+                handleCommand(socket, room, words[0], words.slice(1));
+            }
+
+            else broadcast(room, `M${room}\t${socket.name}\t${message}`);
         }
     });
 });

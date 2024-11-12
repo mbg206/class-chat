@@ -82,6 +82,7 @@ const putMessage = (sender, content) => {
 const roomElements = new Map();
 let roomMessages = new Map();
 const roomUnreads = new Map();
+const notifications = new Set();
 
 let isBlurred = false;
 const updateTitle = () => {
@@ -98,6 +99,8 @@ window.addEventListener("focus", () => {
     isBlurred = false;
     roomUnreads.set(selectedRoom, 0);
     updateTitle();
+    notifications.forEach((n) => n.close());
+    notifications.clear();
 });
 
 let selectedRoom;
@@ -208,14 +211,31 @@ const createSocket = () => {
         }
         else if (type === "M") {
             const data = content.split("\t");
+            const msgContent = data.slice(2).join("\t");
+
             const msgsArr = roomMessages.get(data[0]);
-            msgsArr.push(data.slice(1));
-            if (data[0] === selectedRoom) putMessage(data[1], data.slice(2).join("\t"));
+            msgsArr.push([data[1], msgContent]);
+
+            if (data[0] === selectedRoom) putMessage(data[1], msgContent);
             else roomElements.get(data[0]).classList.add("unread");
 
             if (data[0] !== selectedRoom || isBlurred) {
+                unreads = roomUnreads.get(data[0]);
                 roomUnreads.set(data[0], roomUnreads.get(data[0]) + 1);
                 updateTitle();
+
+                if (isBlurred && Notification.permission === "granted" && unreads < 3) {
+                    const notification = new Notification("Class Chat", {
+                        body: `New message in ${data[1]}: ${msgContent}`
+                    });
+
+                    notification.addEventListener("click", () => window.focus());
+
+                    setTimeout(() => {
+                        notification.close();
+                        notifications.delete(notification);
+                    }, 8000);
+                }
             }
             if (msgsArr.length > 500)
                 msgsArr.shift();
@@ -286,3 +306,6 @@ inputBar.addEventListener("paste", (e) => {
     selection.getRangeAt(0).insertNode(document.createTextNode(text));
     selection.collapseToEnd();
 });
+
+if (Notification.permission === "default")
+    Notification.requestPermission();

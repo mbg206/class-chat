@@ -10,4 +10,6 @@ Finalize readme
 
 Chat log downloading
 
-Refactor server code
+Refactor server code?
+
+Improve neon theme

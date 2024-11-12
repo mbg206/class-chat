@@ -52,8 +52,16 @@ const putMessage = (sender, content) => {
     const atBottom = messageContainer.scrollHeight - messageContainer.clientHeight
         == messageContainer.scrollTop;
 
-    if (sender === "")
-        messageContainer.appendChild(element("div", "message server-content", content));
+    if (sender === "") {
+        const message = element("div", "message");
+        message.append(
+            element("span", ""),
+            element("span", ""),
+            element("span", "server-content", content)
+        );
+        messageContainer.appendChild(message);
+
+    }
     else {
         const message = element("div", "message");
         message.append(
@@ -246,9 +254,9 @@ nameButton.addEventListener("click", () => {
 
 const send = () => {
     if (socket.readyState === WebSocket.OPEN) {
-        const text = inputBar.value.trim();
-        inputBar.value = "";
-        if (text.length === 0 || text.length > 2048) return;
+        const text = inputBar.textContent.trim();
+        inputBar.innerHTML = "<br>";
+        if (text.length === 0) return;
         socket.send(`M${selectedRoom}\t${text}`);
 
         messageContainer.scrollTo({top: messageContainer.scrollHeight - messageContainer.clientHeight});
@@ -257,5 +265,24 @@ const send = () => {
 
 sendButton.addEventListener("click", send);
 inputBar.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") send();
+    if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        send();
+    }
+});
+inputBar.addEventListener("beforeinput", (e) => {
+    if (e.data?.length > 0 && inputBar.textContent.length >= 2048)
+        e.preventDefault();
+});
+
+// force paste to only add plain text
+inputBar.addEventListener("paste", (e) => {
+    e.preventDefault();
+
+    const text = e.clipboardData.getData("text/plain").slice(0, 2048 - inputBar.textContent.length);
+    const selection = window.getSelection();
+    if (selection.rangeCount === 0) return;
+    selection.deleteFromDocument();
+    selection.getRangeAt(0).insertNode(document.createTextNode(text));
+    selection.collapseToEnd();
 });

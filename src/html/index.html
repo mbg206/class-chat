@@ -29,11 +29,13 @@
         <div id="connection-indicator" class="offline"></div>
     </div>
 
-    <div id="messages"></div>
+    <div id="message-input-container">
+        <div id="messages"></div>
 
-    <div class="bar">
-        <input type="text" class="bar-tile" id="input" maxlength="1024">
-        <button class="bar-tile" id="send">Send</button>
+        <div class="bar">
+            <div class="bar-tile" id="input" maxlength="1024" spellcheck="true" contenteditable="true"><br></div>
+            <button class="bar-tile" id="send">Send</button>
+        </div>
     </div>
 
     <script src="scripts.js"></script>

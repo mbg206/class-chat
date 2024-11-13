@@ -80,9 +80,10 @@ const putMessage = (sender, content) => {
 };
 
 const roomElements = new Map();
-let roomMessages = new Map();
+const roomMessages = new Map();
 const roomUnreads = new Map();
-const notifications = new Set();
+let blurredUnreads = 0;
+const notifications = new Map();
 
 let isBlurred = false;
 const updateTitle = () => {
@@ -94,13 +95,18 @@ const updateTitle = () => {
         document.title = "Class Chat";
     else document.title = `(${unreads}) Class Chat`;
 };
-window.addEventListener("blur", () => isBlurred = true);
-window.addEventListener("focus", () => {
-    isBlurred = false;
-    roomUnreads.set(selectedRoom, 0);
-    updateTitle();
-    notifications.forEach((n) => n.close());
-    notifications.clear();
+
+document.addEventListener("visibilitychange", () => {
+    if (document.hidden) isBlurred = true;
+
+    else {
+        isBlurred = false;
+        roomUnreads.set(selectedRoom, 0);
+        updateTitle();
+        notifications.forEach((n) => n.close());
+        notifications.clear();
+        blurredUnreads = 0;
+    }
 });
 
 let selectedRoom;
@@ -220,11 +226,12 @@ const createSocket = () => {
             else roomElements.get(data[0]).classList.add("unread");
 
             if (data[0] !== selectedRoom || isBlurred) {
-                unreads = roomUnreads.get(data[0]);
                 roomUnreads.set(data[0], roomUnreads.get(data[0]) + 1);
                 updateTitle();
 
-                if (isBlurred && Notification.permission === "granted" && unreads < 3) {
+                if (isBlurred && Notification.permission === "granted" && blurredUnreads < 5) {
+                    notifications.get(data[1])?.close();
+
                     const notification = new Notification("Class Chat", {
                         body: `New message in ${data[1]}: ${msgContent}`
                     });
@@ -235,6 +242,9 @@ const createSocket = () => {
                         notification.close();
                         notifications.delete(notification);
                     }, 8000);
+
+                    notifications.set(data[1], notification);
+                    blurredUnreads += 1;
                 }
             }
             if (msgsArr.length > 500)

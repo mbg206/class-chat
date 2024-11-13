@@ -7,7 +7,7 @@ body {
     font-family: 'Trebuchet MS', sans-serif;
 }
 
-button, input, select {
+button, input, select, option {
     background-color: rgba(0, 0, 0, 0);
     color: inherit;
     font-family: inherit;

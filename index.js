@@ -9,7 +9,8 @@ const MIME_TYPES = {
     "html": "text/html",
     "css": "text/css",
     "js": "text/javascript",
-    "woff": "font/woff"
+    "woff": "font/woff",
+    "ttf": "font/ttf"
 };
 
 const httpServer = createServer((req, res) => {

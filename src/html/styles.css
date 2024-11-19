@@ -137,7 +137,7 @@ option {
     height: max-content;
     overflow: scroll;
     overflow-wrap: break-word;
-    white-space: pre-wrap;
+    white-space: pre;
 }
 #input:focus {
     outline: none;

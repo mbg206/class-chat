@@ -262,8 +262,31 @@ const dialog = (message, _default) => {
     return res === null ? "" : res;
 };
 
-roomButton.addEventListener("click", () => {
-    if (socket.readyState === WebSocket.OPEN) {
+const isConnected = () => new Promise(res => {
+    socket.send("P");
+    const listener = (data) => {
+        if (data.data === "P") {
+            res(true);
+            socket.removeEventListener("message", listener);
+            socket.removeEventListener("close", closeListener);
+        }
+    };
+    const closeListener = () => {
+        res(false);
+        socket.removeEventListener("message", listener);
+        socket.removeEventListener("close", closeListener);
+    };
+    socket.addEventListener("message", listener);
+    socket.addEventListener("close", closeListener);
+    setTimeout(() => {
+        res(false);
+        socket.removeEventListener("message", listener);
+        socket.removeEventListener("close", closeListener);
+    }, 5000);
+});
+
+roomButton.addEventListener("click", async () => {
+    if (await isConnected()) {
         const name = dialog("Enter a room name:").trim();
         if (name.length > 16 || name.length === 0)
             alert("Input name has an invalid length!");
@@ -271,8 +294,8 @@ roomButton.addEventListener("click", () => {
     }
 });
 
-nameButton.addEventListener("click", () => {
-    if (socket.readyState === WebSocket.OPEN) {
+nameButton.addEventListener("click", async () => {
+    if (await isConnected()) {
         const name = dialog("Enter a new display name:",
             roomElements.size === 0 ? null : nameButton.textContent).trim();
         
@@ -282,8 +305,8 @@ nameButton.addEventListener("click", () => {
     }
 });
 
-const send = () => {
-    if (socket.readyState === WebSocket.OPEN) {
+const send = async () => {
+    if (await isConnected()) {
         const text = inputBar.textContent.trim();
         inputBar.innerHTML = "<br>";
         if (text.length === 0) return;

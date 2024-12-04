@@ -111,6 +111,10 @@ server.on("connection", (socket) => {
         const msg = data.toString();
         
         const type = msg.charAt(0);
+
+        if (msg === "P")
+            socket.send("P");
+        
         if (type === "N") { // set name
             const name = msg.slice(1).trim();
             if (name.length > 16 || name.length === 0) return;

@@ -23,7 +23,7 @@ option {
     width: 100%;
     background-color: #AAA;
     display: grid;
-    grid-template-columns: 1fr min-content min-content min-content min-content;
+    grid-template-columns: 1fr min-content min-content min-content min-content min-content;
 }
 
 .bar-tile {

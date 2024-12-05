@@ -11,6 +11,7 @@ themeSelect.addEventListener("input", () => {
 setTheme();
 
 const roomContainer = document.getElementById("rooms");
+const downloadButton = document.getElementById("dl-log");
 const roomButton = document.getElementById("add-room");
 const nameButton = document.getElementById("set-name");
 const inputBar = document.getElementById("input");
@@ -52,7 +53,7 @@ const putMessage = (sender, content) => {
     const atBottom = messageContainer.scrollHeight - messageContainer.clientHeight
         == messageContainer.scrollTop;
 
-    if (sender === "") {
+    if (sender.length === 0) {
         const message = element("div", "message");
         message.append(
             element("span", ""),
@@ -212,6 +213,7 @@ const createSocket = () => {
             roomElements.get(content).remove();
             roomElements.delete(content);
             roomUnreads.delete(content);
+            //roomMessages.delete(content);
             updateTitle();
             updateRoomStorage(content);
         }
@@ -283,6 +285,50 @@ const isConnected = () => new Promise(res => {
         socket.removeEventListener("message", listener);
         socket.removeEventListener("close", closeListener);
     }, 5000);
+});
+
+const strToHTML = (str) => {
+    const e = document.createElement("span");
+    e.textContent = str;
+    return e.innerHTML;
+};
+downloadButton.addEventListener("click", () => {
+    if (selectedRoom === undefined) return;
+
+    const messages = roomMessages.get(selectedRoom);
+    const date = new Date();
+
+    let data = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${selectedRoom} - ` +
+        date.toLocaleString("en-US", {
+            month: "2-digit",
+            day: "2-digit",
+            year: "2-digit",
+        }) +
+        "</title><style>body{white-space:pre-wrap;overflow-wrap:break-word;font-size:20px;}.s{font-weight:bold;}.e{font-style:italic;color:#555;}</style></head><body>";
+
+    messages.forEach(msg => {
+        data += "<div>";
+        if (msg[0].length === 0)
+            data += `<span class="e">${strToHTML(msg[1])}</span>`;
+        else data += `<span class="s">${strToHTML(msg[0])}</span>: <span>${msg[1]}</span>`;
+        data += "</div>";
+    });
+
+    data += "</body></html>";
+    
+    const dateStr = date.toLocaleString("en-US", {
+        month: "2-digit",
+        day: "2-digit",
+        year: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+    }).replace(",", " ");
+
+    const a = document.createElement("a");
+    a.href = `data:text/html;charset=utf-8,${encodeURIComponent(data)}`;
+    a.download = `${selectedRoom}-${dateStr}.html`;
+    a.click();
 });
 
 roomButton.addEventListener("click", async () => {

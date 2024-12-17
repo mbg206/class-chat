@@ -110,9 +110,9 @@ document.addEventListener("visibilitychange", () => {
     }
 });
 
-let selectedRoom;
+let selectedRoom = null;
 const selectRoom = (room) => {
-    if (selectedRoom !== undefined)
+    if (selectedRoom !== null)
         roomElements.get(selectedRoom).classList.remove("selected");
     selectedRoom = room;
     messageContainer.innerHTML = "";
@@ -213,6 +213,7 @@ const createSocket = () => {
             roomElements.get(content).remove();
             roomElements.delete(content);
             roomUnreads.delete(content);
+            selectedRoom = null;
             //roomMessages.delete(content);
             updateTitle();
             updateRoomStorage(content);
@@ -293,7 +294,7 @@ const strToHTML = (str) => {
     return e.innerHTML;
 };
 downloadButton.addEventListener("click", () => {
-    if (selectedRoom === undefined) return;
+    if (selectedRoom === null) return;
 
     const messages = roomMessages.get(selectedRoom);
     const date = new Date();

@@ -18,6 +18,9 @@ const inputBar = document.getElementById("input");
 const sendButton = document.getElementById("send");
 const messageContainer = document.getElementById("messages");
 
+const scrollToBottom = () =>
+    messageContainer.scrollTo({top: messageContainer.scrollHeight - messageContainer.clientHeight});
+
 const element = (tag, className, text = null) => {
     const e = document.createElement(tag);
     e.className = className;
@@ -51,7 +54,7 @@ const updateRoomStorage = (leaveRoom = null) => {
 
 const putMessage = (sender, content) => {
     const atBottom = messageContainer.scrollHeight - messageContainer.clientHeight
-        == messageContainer.scrollTop;
+        <= messageContainer.scrollTop + 50;
 
     if (sender.length === 0) {
         const message = element("div", "message");
@@ -73,11 +76,11 @@ const putMessage = (sender, content) => {
         messageContainer.appendChild(message);
     }
 
-    if (messageContainer.children.length > 500)
+    if (messageContainer.children.length > 1000)
         messageContainer.children[0].remove();
 
     if (atBottom)
-        messageContainer.scrollTo({top: messageContainer.scrollHeight - messageContainer.clientHeight});
+        scrollToBottom();
 };
 
 const roomElements = new Map();
@@ -239,7 +242,10 @@ const createSocket = () => {
                         body: `New message in ${data[1]}: ${msgContent}`
                     });
 
-                    notification.addEventListener("click", () => window.focus());
+                    notification.addEventListener("click", () => {
+                        window.focus();
+                        scrollToBottom();
+                    });
 
                     setTimeout(() => {
                         notification.close();
@@ -250,7 +256,7 @@ const createSocket = () => {
                     blurredUnreads += 1;
                 }
             }
-            if (msgsArr.length > 500)
+            if (msgsArr.length > 1000)
                 msgsArr.shift();
         }
 
@@ -359,7 +365,7 @@ const send = async () => {
         if (text.length === 0) return;
         socket.send(`M${selectedRoom}\t${text}`);
 
-        messageContainer.scrollTo({top: messageContainer.scrollHeight - messageContainer.clientHeight});
+        scrollToBottom();
     }
 };
 

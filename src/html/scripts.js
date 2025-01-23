@@ -395,3 +395,5 @@ inputBar.addEventListener("paste", (e) => {
 
 if (Notification.permission === "default")
     Notification.requestPermission();
+
+window.onbeforeunload = () => true;

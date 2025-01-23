@@ -8,8 +8,8 @@
     <link rel="preload" href="styles.css" as="style">
     <link rel="preload" href="themes.css" as="style">
     <link rel="preload" href="scripts.js" as="script">
-    <link rel="preload" href="web_ibm_dos_iso8.woff" as="font">
-    <link rel="preload" href="envy_code_r.ttf" as="font">
+    <link rel="prefetch" href="web_ibm_dos_iso8.woff">
+    <link rel="prefetch" href="envy_code_r.ttf">
 
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="themes.css">
@@ -25,9 +25,9 @@
             <option value="default-dark">Default Dark</option>
             <option value="old">Old</option>
             <option value="terminal">Terminal</option>
-            <option value="neon">Neon</option>
+        <!--<option value="neon">Neon</option>-->
             <option value="cosmic">Cosmic</option>
-            <option value="lava">Lava Lamp</option>
+        <!--<option value="lava">Lava Lamp</option>-->
         </select>
         <div id="connection-indicator" class="offline"></div>
     </div>
@@ -36,7 +36,7 @@
         <div id="messages"></div>
 
         <div class="bar">
-            <div class="bar-tile" id="input" maxlength="1024" spellcheck="true" contenteditable="true"><br></div>
+            <div class="bar-tile" id="input" spellcheck="true" contenteditable="true"><br></div>
             <button class="bar-tile" id="send">Send</button>
         </div>
     </div>

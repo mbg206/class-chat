@@ -239,7 +239,7 @@ const createSocket = () => {
                     notifications.get(data[1])?.close();
 
                     const notification = new Notification("Class Chat", {
-                        body: `New message in ${data[1]}: ${msgContent}`
+                        body: `New message in ${data[0]}: ${msgContent}`
                     });
 
                     notification.addEventListener("click", () => {
@@ -365,7 +365,13 @@ const send = async () => {
         if (text.length === 0) return;
         socket.send(`M${selectedRoom}\t${text}`);
 
-        scrollToBottom();
+        const handler = (e) => {
+            if (e.data.split('\t')[1] === nameButton.textContent) {
+                scrollToBottom();
+                socket.removeEventListener("message", handler);
+            }
+        };
+        socket.addEventListener("message", handler);
     }
 };
 

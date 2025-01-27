@@ -239,7 +239,7 @@ const createSocket = () => {
                     notifications.get(data[1])?.close();
 
                     const notification = new Notification("Class Chat", {
-                        body: `New message in ${data[0]}: ${msgContent}`
+                        body: `\uD83D\uDD14 New message in ${data[0]}\n\n${data[1]}: ${msgContent}`
                     });
 
                     notification.addEventListener("click", () => {

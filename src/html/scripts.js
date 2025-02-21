@@ -235,7 +235,7 @@ const createSocket = () => {
                 roomUnreads.set(data[0], roomUnreads.get(data[0]) + 1);
                 updateTitle();
 
-                if (isBlurred && Notification.permission === "granted" && blurredUnreads < 5) {
+                if (isBlurred && Notification.permission === "granted") { // && blurredUnreads < 5) {
                     notifications.get(data[1])?.close();
 
                     const notification = new Notification("Class Chat", {

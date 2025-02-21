@@ -238,8 +238,9 @@ const createSocket = () => {
                 if (isBlurred && Notification.permission === "granted") { // && blurredUnreads < 5) {
                     notifications.get(data[1])?.close();
 
+                    const notificationContent = data[1] === '' ? msgContent : `${data[1]}: ${msgContent}`;
                     const notification = new Notification("Class Chat", {
-                        body: `\uD83D\uDD14 New message in ${data[0]}\n\n${data[1]}: ${msgContent}`
+                        body: `\uD83D\uDD14 New message in ${data[0]}\n\n${notificationContent}`
                     });
 
                     notification.addEventListener("click", () => {

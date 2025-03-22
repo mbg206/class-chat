@@ -8,8 +8,14 @@ Depends only on `ws`.
 
 Finalize readme
 
-Chat log downloading
+Improve dialog box UI
 
-Refactor server code?
+Re-add themes
 
-Improve neon theme
+Improve chat log downloading
+
+Refactor stylesheets
+
+Add image/file sending
+
+Create basic library to interact with the API?

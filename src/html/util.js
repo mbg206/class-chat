@@ -2,7 +2,7 @@ const parseStringBuffer = (data) => {
     return new TextDecoder().decode(data.slice(1));
 };
 
-const parseMessageBuffer = (data = new Uint8Array()) => {
+const parseMessageBuffer = (data) => {
     const components = [];
     
     let i = data.indexOf(CONTROL_BYTE);

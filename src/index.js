@@ -2,6 +2,7 @@ import { createServer } from "node:http";
 import { readdirSync, createReadStream, readFileSync } from "node:fs";
 import { sep as S } from "node:path";
 import { WebSocketServer, WebSocket } from "ws";
+import sharp from "sharp";
 import { MessageStyle, MessageType, MIME_TYPES } from "./shared/types.js";
 import { createMessageBuffer, createServerMessageBuffer, createStringBuffer } from "./util.js";
 import { validateName, CONTROL_BYTE } from "./shared/shared-util.js";
@@ -165,6 +166,16 @@ const handleCommand = (socket, room, command, args) => {
     else socket.send(createServerMessageBuffer(room, "Unknown command. Type /help for a list of available commands."));
 };
 
+const IMAGE_TYPES = new Set([
+    "image/apng",
+    "image/avif",
+    "image/gif", 
+    "image/jpeg",
+    "image/png",
+    "image/svg+xml",
+    "image/webp"
+]);
+
 server.on("connection", (socket) => {
     socket.rooms = new Set();
     socket.pinged = false;
@@ -261,6 +272,37 @@ server.on("connection", (socket) => {
                 ...parseMarkdown(message)
                 //{style: MessageStyle.PLAIN, content: message}
             ]);
+        }
+
+        // send attachment
+        else if (type === MessageType.SEND_ATTACHMENT) {
+            const mimeStart = data.indexOf(CONTROL_BYTE);
+            if (mimeStart === -1) return;
+            const room = data.toString("utf-8", 1, mimeStart);
+            
+            const dataStart = data.indexOf(CONTROL_BYTE, mimeStart + 1);
+            if (dataStart === -1) return;
+            const mimeType = data.toString("utf-8", mimeStart + 1, dataStart);
+            if (!IMAGE_TYPES.has(mimeType)) return;
+
+            sharp(data.subarray(dataStart + 1)).webp().toBuffer((err, image) => {
+                if (err !== null) {
+                    console.error(err);
+                    socket.send(createServerMessageBuffer(room, "An error occurred while trying to process your file upload"));
+                    return;
+                }
+
+                const nameLen = Buffer.byteLength(socket.name);
+                const roomLen = Buffer.byteLength(room);
+                const data = Buffer.alloc(3 + nameLen + roomLen + image.byteLength);
+                data.writeUint8(MessageType.RECEIVE_ATTACHMENT);
+                data.write(socket.name, 1);
+                data.writeUint8(CONTROL_BYTE, 1 + nameLen);
+                data.write(room, 2 + nameLen);
+                data.writeUint8(CONTROL_BYTE, 2 + nameLen + roomLen);
+                data.set(image, 3 + nameLen + roomLen);
+                socket.send(data);
+            });
         }
     });
 });

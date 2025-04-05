@@ -14,6 +14,7 @@ export const MessageType = {
     REQUEST_JOIN_ROOM: 3,
     REQUEST_LEAVE_ROOM: 4,
     SEND_MESSAGE: 5,
+    SEND_ATTACHMENT: 6,
     
     // client
     SET_NAME: 2,
@@ -21,7 +22,7 @@ export const MessageType = {
     JOIN_ROOM: 4,
     LEAVE_ROOM: 5,
     RECEIVE_MESSAGE: 6,
-    RECEIVE_ATTACHMENT: 6,
+    RECEIVE_ATTACHMENT: 7,
 };
 
 export const AttachmentType = {
@@ -40,5 +41,7 @@ export const MessageStyle = {
     CODE: 2**4,
     SERVER: 2**5,
 
-    NEWBLOCK: 2**6
+    NEWBLOCK: 2**6,
+
+    IMAGE: 2**7
 };

@@ -2,7 +2,7 @@
 
 A very simple and minimal chat application. Originally developed in 1 day.
 
-Depends only on `ws`.
+Depends only on `ws` and `sharp`.
 
 ### TODO
 
@@ -14,6 +14,6 @@ Re-add themes
 
 Refactor stylesheets
 
-Add image/file sending
+Add link formatting
 
 Create basic library to interact with the API?

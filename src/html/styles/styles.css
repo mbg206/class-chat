@@ -180,6 +180,11 @@ option {
     font-style: italic;
 }
 
+.image {
+    max-width: 50%;
+    max-height: 50vh;
+}
+
 /* input bar */
 
 #input {

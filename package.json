@@ -1,6 +1,6 @@
 {
   "name": "class-chat",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "A simple NodeJS chat application.",
   "main": "index.js",
   "type": "module",
@@ -19,6 +19,7 @@
   "homepage": "https://github.com/mbg206/class-chat#readme",
   "dependencies": {
     "class-chat": "file:",
+    "sharp": "^0.34.0",
     "ws": "^8.18.0"
   }
 }

@@ -1,8 +1,9 @@
 const MAX_MESSAGES = 2000;
 
-const element = (tag, className = "", text = null) => {
+const element = (tag, className = null, text = null) => {
     const e = document.createElement(tag);
-    e.className = className;
+    if (className !== null)
+        e.className = className;
     if (text !== null)
         e.textContent = text;
     return e;
@@ -127,6 +128,8 @@ const selectRoom = (room) => {
         roomElements.get(selectedRoom).classList.remove("selected");
     selectedRoom = room;
     messageContainer.innerHTML = "";
+    displayedObjects.forEach(url => URL.revokeObjectURL(url));
+    displayedObjects.clear();
     const messages = roomMessages.get(room);
     messages.forEach(components => putMessage(components));
     roomElements.get(room).classList.add("selected");
@@ -139,6 +142,7 @@ const messageContainer = document.getElementById("messages");
 const scrollToBottom = () =>
     messageContainer.scrollTo({top: messageContainer.scrollHeight - messageContainer.clientHeight});
 
+const displayedObjects = new Set();
 const putMessage = (components) => {
     const atBottom = messageContainer.scrollHeight - messageContainer.clientHeight
         <= messageContainer.scrollTop + 50;
@@ -151,6 +155,15 @@ const putMessage = (components) => {
         if (style === MessageStyle.NEWBLOCK) {
             message.appendChild(block);
             block = element("div");
+            continue;
+        }
+        else if (style === MessageStyle.IMAGE) {
+            const url = URL.createObjectURL(localFiles.get(component.content));
+            const img = document.createElement("img");
+            img.src = url;
+            img.className = "image";
+            block.appendChild(img);
+            displayedObjects.add(url);
             continue;
         }
 
@@ -221,27 +234,23 @@ const isConnected = () => new Promise((res) => {
 const send = async () => {
     if (selectedRoom === null) return;
 
-    if (await isConnected()) {
-        const text = inputBar.textContent.trim();
-        inputBar.innerHTML = "<br>";
-        if (text.length === 0) return;
+    if (!await isConnected()) return;
 
-        const roomBuf = new TextEncoder().encode(selectedRoom);
-        const contentBuf = new TextEncoder().encode(text);
-        const data = new Uint8Array(roomBuf.byteLength + contentBuf.byteLength + 2);
-        data[0] = (MessageType.SEND_MESSAGE);
-        data.set(roomBuf, 1);
-        data[1 + roomBuf.byteLength] = CONTROL_BYTE;
-        data.set(contentBuf, 2 + roomBuf.byteLength);
+    const text = inputBar.textContent.trim();
+    inputBar.innerHTML = "<br>";
+    if (text.length === 0) return;
 
-        socket.send(data);
+    const roomBuf = new TextEncoder().encode(selectedRoom);
+    const contentBuf = new TextEncoder().encode(text);
+    const data = new Uint8Array(roomBuf.byteLength + contentBuf.byteLength + 2);
+    data[0] = MessageType.SEND_MESSAGE;
+    data.set(roomBuf, 1);
+    data[1 + roomBuf.byteLength] = CONTROL_BYTE;
+    data.set(contentBuf, 2 + roomBuf.byteLength);
 
-        const handler = () => {
-            scrollToBottom();
-            socket.removeEventListener("message", handler);
-        };
-        socket.addEventListener("message", handler);
-    }
+    socket.send(data);
+
+    socket.addEventListener("message", scrollToBottom, {once: true});
 };
 
 sendButton.addEventListener("click", send);
@@ -254,6 +263,48 @@ inputBar.addEventListener("keydown", (e) => {
         send();
     }
 });
+
+const fileUpload = document.createElement("input");
+fileUpload.type = "file";
+fileUpload.accept = "image/apng,image/avif,image/gif,image/jpeg,image/png,image/svg+xml,image/webp"; // "image/*,video/*,audio/*";
+document.getElementById("upload").addEventListener("click", () => {
+    if (selectedRoom === null) return;
+    fileUpload.click();
+});
+
+fileUpload.addEventListener("change", async () => {
+    if (fileUpload.files.length !== 1) return;
+    
+    if (selectedRoom === null) return;
+
+    const file = fileUpload.files[0];
+    if (file.size > 10e6) { // 10mb
+        showDialog(`Files have a limit of 10mb! (You uploaded ${Math.ceil(file.size / 1e5) / 10}mb)`)
+        return;
+    }
+    
+    if (!await isConnected()) return;
+    
+    const bytes = await file.bytes();
+    
+    const roomBuf = new TextEncoder().encode(selectedRoom);
+    const mimeBuf = new TextEncoder().encode(file.type);
+    const data = new Uint8Array(bytes.byteLength + mimeBuf.byteLength + roomBuf.byteLength + 3);
+    
+    data[0] = MessageType.SEND_ATTACHMENT;
+    data.set(roomBuf, 1);
+    data[1 + roomBuf.byteLength] = CONTROL_BYTE;
+    data.set(mimeBuf, 2 + roomBuf.byteLength);
+
+    const dataStart = 2 + roomBuf.byteLength + mimeBuf.byteLength;
+    data[dataStart] = CONTROL_BYTE;
+    data.set(bytes, dataStart + 1);
+    
+    socket.send(data);
+
+    socket.addEventListener("message", scrollToBottom, {once: true});
+});
+
 inputBar.addEventListener("beforeinput", (e) => {
     if (e.data?.length > 0 && inputBar.textContent.length >= 2048)
         e.preventDefault();

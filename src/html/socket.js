@@ -27,6 +27,36 @@ const setIndicator = (status) => {
     }
 };
 
+const showNotification = (room, content) => {
+    if (room !== selectedRoom || isBlurred) {
+        roomUnreads.set(room, roomUnreads.get(room) + 1);
+        updateTitle();
+
+        if (isBlurred && Notification.permission === "granted") { // && blurredUnreads < 5) {
+            notifications.get(room)?.close();
+
+            const notification = new Notification("Class Chat", {
+                body: content, silent: true
+            });
+
+            notification.addEventListener("click", () => {
+                window.focus();
+                scrollToBottom();
+            });
+
+            setTimeout(() => {
+                notification.close();
+                notifications.delete(notification);
+            }, 10000);
+
+            notifications.set(room, notification);
+            blurredUnreads += 1;
+        }
+    }
+};
+
+const localFiles = new Map();
+
 let socket;
 const createSocket = () => {
     try {
@@ -36,6 +66,7 @@ const createSocket = () => {
     }
     catch (e) {
         console.log("Error connecting to websocket server!");
+        console.error(e);
         setTimeout(createSocket, 1000);
         return;
     }
@@ -114,37 +145,42 @@ const createSocket = () => {
             if (room === selectedRoom) putMessage(components);
             else roomElements.get(room).classList.add("unread");
 
-            if (room !== selectedRoom || isBlurred) {
-                roomUnreads.set(room, roomUnreads.get(room) + 1);
-                updateTitle();
-
-                if (isBlurred && Notification.permission === "granted") { // && blurredUnreads < 5) {
-                    notifications.get(room)?.close();
-
-                    const notificationContent = components.reduce((pv, cv) => pv + cv.content, "");
-                    const notification = new Notification("Class Chat", {
-                        body: `\uD83D\uDD14 New message in ${room}\n\n${notificationContent}`
-                    });
-
-                    notification.addEventListener("click", () => {
-                        window.focus();
-                        scrollToBottom();
-                    });
-
-                    setTimeout(() => {
-                        notification.close();
-                        notifications.delete(notification);
-                    }, 10000);
-
-                    notifications.set(room, notification);
-                    blurredUnreads += 1;
-                }
-            }
+            const notificationContent = components.reduce((pv, cv) => pv + cv.content, "");
+            showNotification(room, `\uD83D\uDD14 New message in ${room}\n\n${notificationContent}`);
 
             if (msgsArr.length > MAX_MESSAGES)
                 msgsArr.shift();
         }
 
+        else if (type === MessageType.RECEIVE_ATTACHMENT) {
+            const nameEnd = data.indexOf(CONTROL_BYTE);
+            const sender = new TextDecoder().decode(data.slice(1, nameEnd));
+
+            const roomEnd = data.indexOf(CONTROL_BYTE, nameEnd + 1);
+            const room = new TextDecoder().decode(data.slice(nameEnd + 1, roomEnd));
+
+            const image = new Blob([data.slice(roomEnd + 1)], {type: "image/webp"});
+            const uuid = Math.random() * 1e10;
+            localFiles.set(uuid, image);
+
+            const components = [
+                {style: MessageStyle.SENDER | MessageStyle.BOLD, content: sender},
+                {style: MessageStyle.SENDER, content: ": "},
+                {style: MessageStyle.NEWBLOCK},
+                {style: MessageStyle.IMAGE, content: uuid}
+            ];
+
+            const msgsArr = roomMessages.get(room);
+            msgsArr.push(components);
+
+            if (room === selectedRoom) putMessage(components);
+            else roomElements.get(room).classList.add("unread");
+
+            showNotification(room, `\uD83D\uDD14 New message in ${room}\n\n(Image)`);
+
+            if (msgsArr.length > MAX_MESSAGES)
+                msgsArr.shift();
+        }
     });
 };
 createSocket();

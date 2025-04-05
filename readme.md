@@ -12,8 +12,6 @@ Improve dialog box UI
 
 Re-add themes
 
-Improve chat log downloading
-
 Refactor stylesheets
 
 Add image/file sending

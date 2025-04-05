@@ -1,6 +1,6 @@
 {
   "name": "class-chat",
-  "version": "1.0.0",
+  "version": "0.1.1",
   "description": "A simple NodeJS chat application.",
   "main": "index.js",
   "type": "module",

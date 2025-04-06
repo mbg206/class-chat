@@ -14,6 +14,4 @@ Re-add themes
 
 Refactor stylesheets
 
-Add link formatting
-
 Create basic library to interact with the API?

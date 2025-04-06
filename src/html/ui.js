@@ -175,7 +175,14 @@ const putMessage = (components) => {
         if (style & MessageStyle.CODE)          classes.push("code");
         if (style & MessageStyle.SERVER)        classes.push("server");
 
-        block.appendChild(
+        if (style & MessageStyle.LINK) {
+            const anchor = element("a", classes.join(" "), component.content);
+            anchor.href = component.content;
+            anchor.target = "_blank";
+            block.appendChild(anchor);
+        }
+
+        else block.appendChild(
             element("span", classes.join(" "), component.content)
         );
     }

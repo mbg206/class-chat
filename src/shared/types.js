@@ -38,10 +38,11 @@ export const MessageStyle = {
     ITALIC: 2**1,
     UNDERLINE: 2**2,
     STRIKETHROUGH: 2**3,
-    CODE: 2**4,
-    SERVER: 2**5,
+    LINK: 2**4,
+    CODE: 2**5,
+    SERVER: 2**6,
 
-    NEWBLOCK: 2**6,
+    NEWBLOCK: 2**7,
 
-    IMAGE: 2**7
+    IMAGE: 2**8
 };

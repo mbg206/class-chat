@@ -1,6 +1,5 @@
 import { createServer } from "node:http";
 import { readdirSync, createReadStream, readFileSync } from "node:fs";
-import { sep as S } from "node:path";
 import { WebSocketServer, WebSocket } from "ws";
 import sharp from "sharp";
 import { MessageStyle, MessageType, MIME_TYPES } from "./shared/types.js";

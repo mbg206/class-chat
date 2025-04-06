@@ -7,11 +7,10 @@
 .theme-default-dark .bar {
     background-color: #333;
 }
-.theme-default-dark .bar-tile,
-.theme-default-dark .exit-room {
+.theme-default-dark .bar-tile {
     border-color: #888;
 }
-.theme-default-dark .server-content {
+.theme-default-dark .server {
     color: #AAA;
 }
 
@@ -24,37 +23,35 @@
     src: url("web_ibm_dos_iso8.woff") format('woff');
 }
 
-.theme-old {
-    font-family: 'Web IBM DOS ISO8', sans-serif;
+.theme-classic {
+    font-family: 'Web IBM DOS ISO8', monospace;
 }
-.theme-old > .bar:nth-child(1) .bar-tile {
+.theme-classic > .bar .bar-tile {
     background-color: #AAF;
     border-color: #CCF #88D #88D #CCF;
 }
-.theme-old > .bar:nth-child(1) .bar-tile:active {
+.theme-classic > .bar .bar-tile:active {
     border-color: #88D #CCF #CCF #88D;
 }
 
-.theme-old .bar-tile,
-.theme-old .exit-room {
+.theme-classic .bar-tile {
     border-color: #DEDEDE #888 #888 #DEDEDE;
 }
-.theme-old .bar-tile:active,
-.theme-old .exit-room:active {
+.theme-classic .bar-tile:active {
     border-color: #888 #DEDEDE #DEDEDE #888;
 }
 
 /* Terminal */
 
 .theme-terminal {
-    font-family: 'Web IBM DOS ISO8', sans-serif;
+    font-family: 'Web IBM DOS ISO8', monospace;
     background-color: #111;
     color: #FFF;
 }
 .theme-terminal .message {
     color: #3F3;
 }
-.theme-terminal .server-content {
+.theme-terminal .server {
     color: #AAA;
 }
 
@@ -62,13 +59,29 @@
     background-color: #333;
 }
 
-.theme-terminal .bar-tile,
-.theme-terminal .exit-room {
+.theme-terminal .bar-tile {
     border-color: #555 #222 #222 #555;
 }
-.theme-terminal .bar-tile:active,
-.theme-terminal .exit-room:active {
+.theme-terminal .bar-tile:active {
     border-color: #222 #555 #555 #222;
+}
+
+/* Pinky */
+
+.theme-pink {
+    font-family: 'Web IBM DOS ISO8', monospace;
+    background-image: linear-gradient(#ECE0D8, #E3BEC5);
+}
+.theme-pink .bar {
+    background-color: #FDE;
+    outline: 2px solid #555;
+}
+.theme-pink .bar-tile {
+    background-color: #F1EAEE;
+    border-color: #CCC #777 #777 #CCC;
+}
+.theme-pink .bar-tile:active {
+    border-color: #777 #CCC #CCC #777;
 }
 
 /* Neon */
@@ -81,33 +94,52 @@
 }
 
 .theme-neon {
-    font-family: 'Envy Code R', monospace;
+    font-family: 'Envy Code R', sans-serif;
+    /* background-image: linear-gradient(#222, #111); */
     background-color: #111;
     color: #FFF;
 }
+.theme-neon > .bar {
+    /* https://css-tricks.com/how-to-create-neon-text-with-css/ */
+    box-shadow: 0 0 2px #fff,
+                0 0 2px #fff,
+                0 0 6px #FE9813,
+                0 0 12px #FE9813,
+                inset 0 0 10px #FE9813;
+}
 .theme-neon .bar {
-    background-color: #252525;
-    outline: 2px solid #ACF;
-    box-shadow: 0px 0px 4px 4px #ACF;
+    background-color: transparent;
+    margin: 12px;
+    width: calc(100% - 24px);
+    border-radius: 8px;
 }
 
-.theme-neon .bar-tile,
-.theme-neon .exit-room {
-    border: 2px solid #FB8;
-    border-radius: 4px;
-    box-shadow: 0 0 2px #FCA;
-    background-color: #222;
+.theme-neon .bar-tile {
+    border-radius: 8px;
+    box-shadow: 0 0 1px #FFF,
+                0 0 1px #FFF,
+                0 0 6px #13B4FE,
+                0 0 12px #13B4FE,
+                inset 0 0 10px #13B4FE;
+    border: none;
 }
-.theme-neon option {
-    color: inherit;
+.theme-neon .exit-room {
+    box-shadow: none;
 }
 
 .theme-neon .message {
-    text-shadow: 0px 0px 1.5px #AFC;
+    text-shadow: 0 0 3px #1FFE13;
 }
-.theme-neon .server-content {
+.theme-neon .server {
     color: #AAA;
-    text-shadow: 0px 0px 2px #ACF;
+    text-shadow: 0px 0px 2px #888;
+}
+
+.theme-neon #messages {
+    padding: 0 16px;
+}
+.theme-neon #input {
+    line-height: 24px;
 }
 
 /* Cosmic */
@@ -116,17 +148,16 @@
     background-image: linear-gradient(#225, #425);
     color: rgba(255, 255, 255, 0.6);
 }
+.theme-cosmic > .bar {
+    background-color: #336;
+}
 .theme-cosmic .bar {
     background-color: #536;
 }
-.theme-cosmic .bar:nth-child(1) {
-    background-color: #336;
-}
-.theme-cosmic .server-content {
+.theme-cosmic .server {
     color: rgba(255, 255, 255, 0.45);
 }
 
-.theme-cosmic .bar-tile,
-.theme-cosmic .exit-room {
+.theme-cosmic .bar-tile {
     border-color: rgba(0, 0, 0, 0.4);
 }

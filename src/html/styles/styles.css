@@ -77,12 +77,13 @@ option {
 
 .bar-tile {
     display: inline-flex;
-    background-color: #AAA;
+    background-color: transparent;
     height: 32px;
     margin: 8px;
     padding: 4px;
     border: 2px solid #000;
     align-items: center;
+    justify-content: center;
     user-select: none;
     cursor: pointer;
     white-space: nowrap;
@@ -121,15 +122,10 @@ option {
 }
 
 .exit-room {
-    border: 2px solid #000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     height: 20px;
     width: 20px;
-    font-size: 20px;
     user-select: none;
-    margin-left: 8px;
+    margin: 0 0 0 8px;
     cursor: pointer;
 }
 .exit-room:hover {
@@ -199,6 +195,9 @@ option {
 }
 #input:focus {
     outline: none;
+}
+#upload {
+    width: 32px;
 }
 #send {
     cursor: pointer;

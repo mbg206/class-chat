@@ -1,15 +1,15 @@
 {
   "name": "class-chat",
-  "version": "0.2.0",
+  "version": "2.0.0",
   "description": "A simple NodeJS chat application.",
-  "main": "index.js",
+  "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/index.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mbg206/class-chat.git"
+    "url": "git+https://github.com/mbg206/class-chat"
   },
   "author": "mbg206",
   "license": "ISC",

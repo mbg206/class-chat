@@ -6,7 +6,7 @@ const KEPT_RULES = [
     ".bold", ".italic",
     ".underline", ".strikethrough",
     ".code", ".underline.strikethrough",
-    ".server"
+    ".server", ".image"
 ];
 
 const downloadButton = document.getElementById("dl-log");
@@ -16,7 +16,7 @@ const strToHTML = (str) => {
     e.textContent = str;
     return e.innerHTML;
 };
-downloadButton.addEventListener("click", () => {
+downloadButton.addEventListener("click", async () => {
     if (selectedRoom === null) return;
 
     const mainSheet = document.styleSheets[0].cssRules;
@@ -52,7 +52,20 @@ downloadButton.addEventListener("click", () => {
         second: "2-digit"
     }).replace(",", " ");
 
-    let data = "<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
+    const messages = messageContainer.cloneNode(true);
+    for (const image of messages.getElementsByTagName("img")) {
+        try {
+            const res = await fetch(image.src);
+            const buf = await res.arrayBuffer();
+            image.src = "data:image/webp;base64," + btoa(String.fromCharCode(...new Uint8Array(buf)));
+        }
+        catch (e) {
+            image.removeAttribute("src");
+            image.alt = "(deleted image)";
+        }
+    }
+
+    let data = "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
                 `<title>${selectedRoom} - ` +
                 date.toLocaleString("en-US", {
                     month: "2-digit",
@@ -60,7 +73,7 @@ downloadButton.addEventListener("click", () => {
                     year: "2-digit",
                 }) +
                 `</title><style>${styleText}</style></head><body class="theme-${theme}"><div class="bar"><div class="bar-tile">${selectedRoom} - ${dateStr}` +
-                `</div></div><div id=\"messages\">${messageContainer.innerHTML}</div></body></html>`;
+                `</div></div><div id=\"messages\">${messages.innerHTML}</div></body></html>`;
 
     const a = document.createElement("a");
     a.href = `data:text/html;charset=utf-8,${encodeURIComponent(data)}`;

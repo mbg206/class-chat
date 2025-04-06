@@ -161,7 +161,9 @@ const createSocket = () => {
 
             const image = new Blob([data.slice(roomEnd + 1)], {type: "image/webp"});
             const uuid = Math.random() * 1e10;
+            
             localFiles.set(uuid, image);
+            if (localFiles.size > 15) localFiles.delete(localFiles.keys().next().value);
 
             const components = [
                 {style: MessageStyle.SENDER | MessageStyle.BOLD, content: sender},

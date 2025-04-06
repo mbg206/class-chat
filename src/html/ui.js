@@ -106,7 +106,7 @@ const addRoom = (room) => {
         }
     });
 
-    const exitButton = element("button", "exit-room", "\u00D7");
+    const exitButton = element("button", "bar-tile exit-room", "\u00D7");
 
     tab.append(element("span", "room-name", room), exitButton);
     roomElements.set(room, tab);
@@ -158,12 +158,15 @@ const putMessage = (components) => {
             continue;
         }
         else if (style === MessageStyle.IMAGE) {
-            const url = URL.createObjectURL(localFiles.get(component.content));
-            const img = document.createElement("img");
-            img.src = url;
-            img.className = "image";
-            block.appendChild(img);
-            displayedObjects.add(url);
+            if (localFiles.has(component.content)) {
+                const url = URL.createObjectURL(localFiles.get(component.content));
+                const img = document.createElement("img");
+                img.src = url;
+                img.className = "image";
+                block.appendChild(img);
+                displayedObjects.add(url);
+            }
+            else block.appendChild(element("span", "", "(deleted image)"));
             continue;
         }
 
@@ -286,7 +289,7 @@ fileUpload.addEventListener("change", async () => {
 
     const file = fileUpload.files[0];
     if (file.size > 10e6) { // 10mb
-        showDialog(`Files have a limit of 10mb! (You uploaded ${Math.ceil(file.size / 1e5) / 10}mb)`)
+        showDialog(`Files have a limit of 10mb! (You uploaded ${Math.ceil(file.size / 1e5) / 10}mb)`);
         return;
     }
     

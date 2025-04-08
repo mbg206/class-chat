@@ -23,6 +23,7 @@ export const MessageType = {
     LEAVE_ROOM: 5,
     RECEIVE_MESSAGE: 6,
     RECEIVE_ATTACHMENT: 7,
+    FUN: 8
 };
 
 export const AttachmentType = {

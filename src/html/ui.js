@@ -363,3 +363,82 @@ document.addEventListener("visibilitychange", () => {
         blurredUnreads = 0;
     }
 });
+
+// :)
+
+
+
+const ANIMATIONS = {
+    barrelRoll: document.body.animate([
+        {transform: "rotate(0deg)"},
+        {transform: "rotate(360deg)"}
+    ], {
+        easing: "linear",
+        duration: 2500,
+    }),
+    
+    spinOut: document.body.animate([
+        {transform: "perspective(500px) translate3d(0, 0, 0) rotateY(0deg)"},
+        {
+            transform: "perspective(500px) translate3d(30%, -170%, -1024px) rotateY(180deg)",
+            offset: 0.2
+        },
+        {
+            transform: "perspective(500px) translate3d(30%, -170%, -1024px) rotateY(180deg)",
+            offset: 0.85
+        },
+        {transform: "perspective(500px) translate3d(0, 0, 0) rotateY(360deg)"}
+    ], {
+        easing: "linear",
+        duration: 6500,
+    }),
+    
+    small: document.body.animate([
+        {
+            overflow: "hidden",
+            offsetPath: "ellipse(20% 20%)",
+            offsetRotate: "0deg",
+            transform: "scale(1) translateX(-20%)",
+            offsetDistance: "0%"
+        },
+        {
+            overflow: "hidden",
+            offsetPath: "ellipse(20% 20%)",
+            offsetRotate: "0deg",
+            transform: "scale(0.4) translateX(0)",
+            offset: 0.2
+        },
+        {
+            overflow: "hidden",
+            offsetPath: "ellipse(20% 20%)",
+            offsetRotate: "0deg",
+            transform: "scale(0.4) translateX(0)",
+            offset: 0.8
+        },
+        {
+            overflow: "hidden",
+            offsetPath: "ellipse(20% 20%)",
+            offsetRotate: "0deg",
+            transform: "scale(1) translateX(20%)",
+            offsetDistance: "350%"
+        }
+    ], {
+        easing: "cubic-bezier(0.2, 0, 0.8, 1)",
+        duration: 9000,
+    }),
+    
+    flyOut: document.body.animate([
+        {transform: "translateX(0vw)"},
+        {transform: "translateX(-100vw)", offset: 0.2},
+        {transform: "translateX(-100vw)", offset: 0.85},
+        {transform: "translateX(0vw)"}
+    ], {
+        easing: "linear",
+        duration: 6500,
+    })
+};
+
+ANIMATIONS.barrelRoll.cancel();
+ANIMATIONS.spinOut.cancel();
+ANIMATIONS.small.cancel();
+ANIMATIONS.flyOut.cancel();

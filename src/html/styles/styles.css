@@ -48,7 +48,7 @@ option {
     padding: 24px;
     border-style: dashed;
 }
-#dialog-box .bar-tile {
+#dialog-window .bar-tile {
     background-color: #FFF;
 }
 

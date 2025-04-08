@@ -183,6 +183,16 @@ const createSocket = () => {
             if (msgsArr.length > MAX_MESSAGES)
                 msgsArr.shift();
         }
+
+        else if (type === MessageType.FUN) {
+            const fun = data[1];
+            [
+                ANIMATIONS.barrelRoll,
+                ANIMATIONS.spinOut,
+                ANIMATIONS.small,
+                ANIMATIONS.flyOut
+            ][fun].play();
+        }
     });
 };
 createSocket();

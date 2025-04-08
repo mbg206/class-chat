@@ -7,6 +7,8 @@ import { createMessageBuffer, createServerMessageBuffer, createStringBuffer } fr
 import { validateName, CONTROL_BYTE } from "./shared/shared-util.js";
 import { parseMarkdown } from "./markdown.js";
 
+const FUN_ENABLED = process.env.FUN || true;
+
 const PORT = process.env.PORT || 8000;
 const FILES = new Map([
     ...readdirSync("src", {recursive: true, withFileTypes: true})
@@ -68,6 +70,17 @@ const HELP_MENU = [
     style: (i % 2 == 1) ? MessageStyle.UNDERLINE : MessageStyle.PLAIN,
     content: a
 }));
+
+const findUser = (name, room) => {
+    let target = null;
+    for (const s of server.clients) {
+        if (s.name === name && s.rooms.has(room)) {
+            target = s;
+            break;
+        }
+    }
+    return target;
+};
 const handleCommand = (socket, room, command, args) => {
     if (command === "help")
         socket.send(createServerMessageBuffer(room, HELP_MENU));
@@ -96,70 +109,111 @@ const handleCommand = (socket, room, command, args) => {
     }
 
     else if (command === "msg") {
+        if (args.length === 0)
+            return socket.send(createServerMessageBuffer(room, "No target specified!"));
+
         const targetName = args[0];
 
-        if (targetName === socket.name) {
-            socket.send(createServerMessageBuffer(room, "You can't message yourself, silly!"));
-            return;
-        }
+        if (targetName === socket.name)
+            return socket.send(createServerMessageBuffer(room, "You can't message yourself, silly!"));
 
-        let target = null;
-        for (const s of server.clients) {
-            if (s.name === targetName && s.rooms.has(room)) {
-                target = s;
-                break;
-            }
-        }
+        const target = findUser(targetName, room);
         
         if (target === null)
-            socket.send(createServerMessageBuffer(room, `User ${targetName} not found!`));
+            return socket.send(createServerMessageBuffer(room, `User ${targetName} not found!`));
 
+        const content = args.slice(1).join(" ").trim();
+        if (content.length === 0)
+            socket.send(createServerMessageBuffer(room, `Message content empty!`));
         else {
-            const content = args.slice(1).join(" ").trim();
-            if (content.length === 0)
-                socket.send(createServerMessageBuffer(room, `Message content empty!`));
-            else {
-                socket.send(createServerMessageBuffer(room, [
-                    {
-                        style: MessageStyle.UNDERLINE,
-                        content: "You to "
-                    },
-                    {
-                        style: MessageStyle.UNDERLINE | MessageStyle.BOLD,
-                        content: targetName
-                    },
-                    {
-                        style: MessageStyle.PLAIN,
-                        content: ": "
-                    },
-                    {style: MessageStyle.NEWBLOCK},
-                    {
-                        style: MessageStyle.PLAIN,
-                        content: content
-                    }
-                ]));
-                
-                target.send(createServerMessageBuffer(room, [
-                    {
-                        style: MessageStyle.UNDERLINE | MessageStyle.BOLD,
-                        content: targetName
-                    },
-                    {
-                        style: MessageStyle.UNDERLINE,
-                        content: " to you"
-                    },
-                    {
-                        style: MessageStyle.PLAIN,
-                        content: ": "
-                    },
-                    {style: MessageStyle.NEWBLOCK},
-                    {
-                        style: MessageStyle.PLAIN,
-                        content: content
-                    }
-                ]));
-            }
+            socket.send(createServerMessageBuffer(room, [
+                {
+                    style: MessageStyle.UNDERLINE,
+                    content: "You to "
+                },
+                {
+                    style: MessageStyle.UNDERLINE | MessageStyle.BOLD,
+                    content: targetName
+                },
+                {
+                    style: MessageStyle.PLAIN,
+                    content: ": "
+                },
+                {style: MessageStyle.NEWBLOCK},
+                {
+                    style: MessageStyle.PLAIN,
+                    content: content
+                }
+            ]));
+            
+            target.send(createServerMessageBuffer(room, [
+                {
+                    style: MessageStyle.UNDERLINE | MessageStyle.BOLD,
+                    content: targetName
+                },
+                {
+                    style: MessageStyle.UNDERLINE,
+                    content: " to you"
+                },
+                {
+                    style: MessageStyle.PLAIN,
+                    content: ": "
+                },
+                {style: MessageStyle.NEWBLOCK},
+                {
+                    style: MessageStyle.PLAIN,
+                    content: content
+                }
+            ]));
         }
+    }
+
+    
+    else if (FUN_ENABLED && (command === "barrelroll" || command === "spinout" || command === "small" || command === "flyout")) {
+        let target;
+        if (args.length === 0)
+            target = socket;
+        else {
+            target = findUser(args[0], room);
+        
+            if (target === null)
+                return socket.send(createServerMessageBuffer(room, `User ${args[0]} not found!`));
+        }
+
+        let name;
+        let timeout;
+        let index;
+        if (command === "barrelroll") {
+            name = "Barrel roll'ed";
+            timeout = 2500;
+            index = 0;
+        }
+        else if (command === "spinout") {
+            name = "Spin-out'd";
+            timeout = 6500;
+            index = 1;
+        }
+        else if (command === "small") {
+            name = "Small DVD'd";
+            timeout = 9000;
+            index = 2;
+        }
+        else if (command === "flyout") {
+            name = "Fly-out'd";
+            timeout = 6500;
+            index = 3;
+        }
+        socket.send(createServerMessageBuffer(room, `${name} ${target.name}`));
+
+        const data = Buffer.alloc(2);
+        data.writeUint8(MessageType.FUN);
+        data.writeUint8(index, 1);
+        target.send(data);
+
+        if (target !== socket)
+            setTimeout(() =>
+                target.send(createServerMessageBuffer(room, `You've been ${name.charAt(0).toLowerCase()}${name.slice(1)} by ${socket.name}`)),
+            timeout);
     }
 
     else socket.send(createServerMessageBuffer(room, "Unknown command. Type /help for a list of available commands."));

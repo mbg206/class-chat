@@ -145,7 +145,7 @@ const createSocket = () => {
             if (room === selectedRoom) putMessage(components);
             else roomElements.get(room).classList.add("unread");
 
-            const notificationContent = components.reduce((pv, cv) => pv + cv.content, "");
+            const notificationContent = components.reduce((pv, cv) => cv.style === MessageStyle.NEWBLOCK ? pv : pv + cv.content, "");
             showNotification(room, `\uD83D\uDD14 New message in ${room}\n\n${notificationContent}`);
 
             if (msgsArr.length > MAX_MESSAGES)
@@ -194,8 +194,10 @@ const nameButton = document.getElementById("set-name");
 
 roomButton.addEventListener("click", async () => {
     if (await isConnected()) {
-        const name = (await showDialog("Enter a room name:", "Join", true)).trim();
-        if (!validateName(name))
+        const name = await showDialog("Enter a room name:", "Join", true);
+        if (name === null) return;
+
+        if (!validateName(name.trim()))
             showDialog("Input name is invalid!");
         else socket.send(createStringBuffer(MessageType.REQUEST_JOIN_ROOM, name));
     }
@@ -203,10 +205,11 @@ roomButton.addEventListener("click", async () => {
 
 nameButton.addEventListener("click", async () => {
     if (await isConnected()) {
-        const name = (await showDialog("Enter a new display name:", "Set", true,
-            roomElements.size === 0 ? null : nameButton.textContent)).trim();
+        const name = await showDialog("Enter a new display name:", "Set", true,
+            roomElements.size === 0 ? null : nameButton.textContent);
+        if (name === null) return;
         
-        if (!validateName(name))
+        if (!validateName(name.trim()))
             showDialog("Input name is invalid!");
         else socket.send(createStringBuffer(MessageType.REQUEST_NAME, name));
     }

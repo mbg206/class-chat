@@ -10,11 +10,14 @@
 .theme-default-dark .bar-tile {
     border-color: #888;
 }
+.theme-default-dark #dialog-window .bar-tile {
+    background-color: #151515;
+}
 .theme-default-dark .server {
     color: #AAA;
 }
 
-/* Old */
+/* Classic */
 
 @font-face {
     font-family: 'Web IBM DOS ISO8';
@@ -55,7 +58,8 @@
     color: #AAA;
 }
 
-.theme-terminal .bar {
+.theme-terminal .bar,
+.theme-terminal .bar-tile {
     background-color: #333;
 }
 
@@ -64,6 +68,13 @@
 }
 .theme-terminal .bar-tile:active {
     border-color: #222 #555 #555 #222;
+}
+
+.theme-terminal #dialog-box {
+    background-color: #151515;
+}
+.theme-terminal #dialog-window .bar-tile {
+    background-color: #333;
 }
 
 /* Pinky */
@@ -127,9 +138,28 @@
     box-shadow: none;
 }
 
+.theme-neon option {
+    color: inherit;
+    background-color: #000;
+}
+
+.theme-neon #dialog-window .bar-tile {
+    background-color: inherit;
+}
+
 .theme-neon .message {
     text-shadow: 0 0 3px #1FFE13;
 }
+.theme-neon .message a {
+    color: #13F2FE;
+    text-shadow: 0 0 3px #13F2FE;
+}
+/*
+.theme-neon .message a:visited {
+    color: #B013FE;
+    text-shadow: 0 0 3px #B013FE;
+}
+*/
 .theme-neon .server {
     color: #AAA;
     text-shadow: 0px 0px 2px #888;
@@ -149,7 +179,7 @@
     color: rgba(255, 255, 255, 0.6);
 }
 .theme-cosmic > .bar {
-    background-color: #336;
+    background-color: #336 !important;
 }
 .theme-cosmic .bar {
     background-color: #536;
@@ -160,4 +190,7 @@
 
 .theme-cosmic .bar-tile {
     border-color: rgba(0, 0, 0, 0.4);
+}
+.theme-cosmic #dialog-window .bar-tile {
+    background-color: inherit;
 }

@@ -40,10 +40,12 @@ const dialogContainer = document.getElementById("dialog-window");
 const dialogText = document.getElementById("dialog-text");
 const dialogInput = document.getElementById("dialog-input");
 const dialogClose = document.getElementById("dialog-close");
+const dialogCancel = document.getElementById("dialog-cancel");
 
 const showDialog = (text, closeText = "OK", input = false, defaultInput = "") => {
     dialogText.textContent = text;
     
+    dialogCancel.style.visibility = input ? "visible" : "hidden";
     dialogContainer.style.display = "flex";
 
     if (input) {
@@ -58,16 +60,29 @@ const showDialog = (text, closeText = "OK", input = false, defaultInput = "") =>
 
     dialogClose.textContent = closeText;
 
-
     return new Promise(res => {
-        dialogClose.addEventListener("click", () => {
-            dialogContainer.style.display = "none";
+        const clickListener = (e) => {
+            let closed = false;
 
-            if (input) {
-                res(dialogInput.value);
+            if (e.target === dialogCancel) {
+                res(null);
+                closed = true;
             }
-            else res();
-        }, {once: true});
+            else if (e.target === dialogClose) {
+                closed = true;
+                if (input) {
+                    res(dialogInput.value);
+                }
+                else res();
+            }
+
+            if (closed) {
+                dialogContainer.style.display = "none";
+                dialogContainer.removeEventListener("click", clickListener);
+            }
+        };
+
+        dialogContainer.addEventListener("click", clickListener);
     });
 };
 
@@ -180,7 +195,8 @@ const putMessage = (components) => {
 
         if (style & MessageStyle.LINK) {
             const anchor = element("a", classes.join(" "), component.content);
-            anchor.href = component.content;
+            const href = component.content;
+            anchor.href = URL.canParse(href) ? href : `//${href}`;
             anchor.target = "_blank";
             block.appendChild(anchor);
         }
